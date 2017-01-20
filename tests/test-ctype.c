@@ -1,5 +1,5 @@
-/* Test of malloc function.
-   Copyright (C) 2010-2013 Free Software Foundation, Inc.
+/* Test of <ctype.h> substitute.
+   Copyright (C) 2009-2016 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -14,16 +14,14 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
+/* Written by Eric Blake <ebb9@byu.net>, 2009.  */
+
 #include <config.h>
 
-#include <stdlib.h>
+#include <ctype.h>
 
 int
-main ()
+main (void)
 {
-  /* Check that malloc (0) is not a NULL pointer.  */
-  if (malloc (0) == NULL)
-    return 1;
-
   return 0;
 }
