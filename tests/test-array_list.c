@@ -1,5 +1,5 @@
 /* Test of sequential list data type implementation.
-   Copyright (C) 2006-2016 Free Software Foundation, Inc.
+   Copyright (C) 2006-2021 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2007.
 
    This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
@@ -42,6 +42,42 @@ check_equals (gl_list_t list1, gl_list_t list2)
     {
       ASSERT (gl_list_get_at (list1, i) == gl_list_get_at (list2, i));
     }
+}
+
+static void
+check_equals_by_forward_iteration (gl_list_t list1, gl_list_t list2)
+{
+  size_t n = gl_list_size (list1);
+  size_t i;
+  gl_list_node_t node2;
+
+  i = 0;
+  node2 = gl_list_first_node (list2);
+  while (i < n && node2 != NULL)
+    {
+      ASSERT (gl_list_get_at (list1, i) == gl_list_node_value (list2, node2));
+      i++;
+      node2 = gl_list_next_node (list2, node2);
+    }
+  ASSERT ((i == n) == (node2 == NULL));
+}
+
+static void
+check_equals_by_backward_iteration (gl_list_t list1, gl_list_t list2)
+{
+  size_t n = gl_list_size (list1);
+  size_t i;
+  gl_list_node_t node2;
+
+  i = n - 1;
+  node2 = gl_list_last_node (list2);
+  while (i != (size_t)(-1) && node2 != NULL)
+    {
+      ASSERT (gl_list_get_at (list1, i) == gl_list_node_value (list2, node2));
+      i--;
+      node2 = gl_list_previous_node (list2, node2);
+    }
+  ASSERT ((i == (size_t)(-1)) == (node2 == NULL));
 }
 
 int
@@ -75,9 +111,12 @@ main (int argc, char *argv[])
 
     check_equals (list1, list2);
 
+    check_equals_by_forward_iteration (list1, list2);
+    check_equals_by_backward_iteration (list1, list2);
+
     for (repeat = 0; repeat < 10000; repeat++)
       {
-        unsigned int operation = RANDOM (16);
+        unsigned int operation = RANDOM (18);
         switch (operation)
           {
           case 0:
@@ -252,7 +291,23 @@ main (int argc, char *argv[])
                 ASSERT (gl_list_size (list1) == n - 1);
               }
             break;
-          case 11: case 12: /* remove 1 element */
+          case 11: /* remove first element */
+            {
+              size_t n = gl_list_size (list1);
+              bool removed1 = gl_list_remove_first (list1);
+              ASSERT (gl_list_remove_first (list2) == removed1);
+              ASSERT (gl_list_size (list1) == n - (int) removed1);
+            }
+            break;
+          case 12: /* remove last element */
+            {
+              size_t n = gl_list_size (list1);
+              bool removed1 = gl_list_remove_last (list1);
+              ASSERT (gl_list_remove_last (list2) == removed1);
+              ASSERT (gl_list_size (list1) == n - (int) removed1);
+            }
+            break;
+          case 13: case 14: /* remove 1 element */
             if (gl_list_size (list1) > 0)
               {
                 size_t n = gl_list_size (list1);
@@ -262,7 +317,7 @@ main (int argc, char *argv[])
                 ASSERT (gl_list_size (list1) == n - 1);
               }
             break;
-          case 13:
+          case 15:
             if (gl_list_size (list1) > 0)
               {
                 size_t n = gl_list_size (list1);
@@ -272,7 +327,7 @@ main (int argc, char *argv[])
                 ASSERT (gl_list_size (list1) == n);
               }
             break;
-          case 14:
+          case 16:
             {
               size_t n = gl_list_size (list1);
               gl_list_iterator_t iter1, iter2;
@@ -292,7 +347,7 @@ main (int argc, char *argv[])
               gl_list_iterator_free (&iter2);
             }
             break;
-          case 15:
+          case 17:
             {
               size_t end = RANDOM (gl_list_size (list1) + 1);
               size_t start = RANDOM (end + 1);

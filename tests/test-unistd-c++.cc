@@ -1,5 +1,5 @@
 /* Test of <unistd.h> substitute in C++ mode.
-   Copyright (C) 2010-2016 Free Software Foundation, Inc.
+   Copyright (C) 2010-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Bruno Haible <bruno@clisp.org>, 2010.  */
 
@@ -23,6 +23,10 @@
 
 #include "signature.h"
 
+
+#if GNULIB_TEST_ACCESS
+SIGNATURE_CHECK (GNULIB_NAMESPACE::access, int, (const char *, int));
+#endif
 
 #if GNULIB_TEST_CHDIR
 SIGNATURE_CHECK (GNULIB_NAMESPACE::chdir, int, (const char *));
@@ -46,6 +50,41 @@ SIGNATURE_CHECK (GNULIB_NAMESPACE::dup2, int, (int, int));
 
 #if GNULIB_TEST_DUP3
 SIGNATURE_CHECK (GNULIB_NAMESPACE::dup3, int, (int, int, int));
+#endif
+
+#if GNULIB_TEST_EXECL
+SIGNATURE_CHECK (GNULIB_NAMESPACE::execl, int,
+                 (const char *, const char *, ...));
+#endif
+
+#if GNULIB_TEST_EXECLE
+SIGNATURE_CHECK (GNULIB_NAMESPACE::execle, int,
+                 (const char *, const char *, ...));
+#endif
+
+#if GNULIB_TEST_EXECLP
+SIGNATURE_CHECK (GNULIB_NAMESPACE::execlp, int,
+                 (const char *, const char *, ...));
+#endif
+
+#if GNULIB_TEST_EXECV
+SIGNATURE_CHECK (GNULIB_NAMESPACE::execv, int,
+                 (const char *, char * const *));
+#endif
+
+#if GNULIB_TEST_EXECVE
+SIGNATURE_CHECK (GNULIB_NAMESPACE::execve, int,
+                 (const char *, char * const *, char * const *));
+#endif
+
+#if GNULIB_TEST_EXECVP
+SIGNATURE_CHECK (GNULIB_NAMESPACE::execvp, int,
+                 (const char *, char * const *));
+#endif
+
+#if GNULIB_TEST_EXECVPE
+SIGNATURE_CHECK (GNULIB_NAMESPACE::execvpe, int,
+                 (const char *, char * const *, char * const *));
 #endif
 
 #if GNULIB_TEST_EUIDACCESS
@@ -90,6 +129,10 @@ SIGNATURE_CHECK (GNULIB_NAMESPACE::getdomainname, int, (char *, size_t));
 SIGNATURE_CHECK (GNULIB_NAMESPACE::getdtablesize, int, (void));
 #endif
 
+#if GNULIB_TEST_GETENTROPY
+SIGNATURE_CHECK (GNULIB_NAMESPACE::getentropy, int, (void *, size_t));
+#endif
+
 #if GNULIB_TEST_GETGROUPS
 SIGNATURE_CHECK (GNULIB_NAMESPACE::getgroups, int, (int, gid_t *));
 #endif
@@ -110,6 +153,10 @@ SIGNATURE_CHECK (GNULIB_NAMESPACE::getlogin_r, int, (char *, size_t));
 SIGNATURE_CHECK (GNULIB_NAMESPACE::getpagesize, int, (void));
 #endif
 
+#if GNULIB_TEST_GETPASS
+SIGNATURE_CHECK (GNULIB_NAMESPACE::getpass, char *, (const char *));
+#endif
+
 #if GNULIB_TEST_GETUSERSHELL
 SIGNATURE_CHECK (GNULIB_NAMESPACE::getusershell, char *, (void));
 #endif
@@ -124,6 +171,10 @@ SIGNATURE_CHECK (GNULIB_NAMESPACE::endusershell, void, (void));
 
 #if GNULIB_TEST_GROUP_MEMBER
 SIGNATURE_CHECK (GNULIB_NAMESPACE::group_member, int, (gid_t));
+#endif
+
+#if GNULIB_TEST_ISATTY
+SIGNATURE_CHECK (GNULIB_NAMESPACE::isatty, int, (int));
 #endif
 
 #if GNULIB_TEST_LCHOWN
@@ -161,6 +212,10 @@ SIGNATURE_CHECK (GNULIB_NAMESPACE::pwrite, ssize_t,
                  (int, const void *, size_t, off_t));
 #endif
 
+#if GNULIB_TEST_READ
+SIGNATURE_CHECK (GNULIB_NAMESPACE::read, ssize_t, (int, void *, size_t));
+#endif
+
 #if GNULIB_TEST_READLINK
 SIGNATURE_CHECK (GNULIB_NAMESPACE::readlink, ssize_t,
                  (const char *, char *, size_t));
@@ -175,6 +230,10 @@ SIGNATURE_CHECK (GNULIB_NAMESPACE::readlinkat, ssize_t,
 SIGNATURE_CHECK (GNULIB_NAMESPACE::rmdir, int, (char const *));
 #endif
 
+#if GNULIB_TEST_SETHOSTNAME
+SIGNATURE_CHECK (GNULIB_NAMESPACE::sethostname, int, (const char *, size_t));
+#endif
+
 #if GNULIB_TEST_SLEEP
 SIGNATURE_CHECK (GNULIB_NAMESPACE::sleep, unsigned int, (unsigned int));
 #endif
@@ -186,6 +245,10 @@ SIGNATURE_CHECK (GNULIB_NAMESPACE::symlink, int, (char const *, char const *));
 #if GNULIB_TEST_SYMLINKAT
 SIGNATURE_CHECK (GNULIB_NAMESPACE::symlinkat, int,
                  (char const *, int, char const *));
+#endif
+
+#if GNULIB_TEST_TRUNCATE
+SIGNATURE_CHECK (GNULIB_NAMESPACE::truncate, int, (const char *, off_t));
 #endif
 
 #if GNULIB_TEST_TTYNAME_R

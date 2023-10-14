@@ -1,5 +1,5 @@
 /* Open a stream with a given file descriptor.
-   Copyright (C) 2011-2016 Free Software Foundation, Inc.
+   Copyright (C) 2011-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
@@ -27,7 +27,8 @@
 
 #undef fdopen
 
-#if HAVE_MSVC_INVALID_PARAMETER_HANDLER
+#if defined _WIN32 && !defined __CYGWIN__
+# if HAVE_MSVC_INVALID_PARAMETER_HANDLER
 static FILE *
 fdopen_nothrow (int fd, const char *mode)
 {
@@ -35,7 +36,7 @@ fdopen_nothrow (int fd, const char *mode)
 
   TRY_MSVC_INVAL
     {
-      result = fdopen (fd, mode);
+      result = _fdopen (fd, mode);
     }
   CATCH_MSVC_INVAL
     {
@@ -45,6 +46,9 @@ fdopen_nothrow (int fd, const char *mode)
 
   return result;
 }
+# else
+#  define fdopen_nothrow _fdopen
+# endif
 #else
 # define fdopen_nothrow fdopen
 #endif

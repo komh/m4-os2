@@ -1,5 +1,5 @@
 /* Test of ordered set data type implementation.
-   Copyright (C) 2006-2016 Free Software Foundation, Inc.
+   Copyright (C) 2006-2021 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2006.
 
    This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
@@ -24,6 +24,8 @@
 
 #include "gl_array_oset.h"
 #include "macros.h"
+
+#include "test-oset-update.h"
 
 extern void gl_avltree_oset_check_invariants (gl_oset_t set);
 
@@ -66,6 +68,12 @@ check_all (gl_oset_t set1, gl_oset_t set2)
   check_equals (set1, set2);
 }
 
+static bool
+is_at_least (const void *elt, const void *threshold)
+{
+  return strcmp ((const char *) elt, (const char *) threshold) >= 0;
+}
+
 int
 main (int argc, char *argv[])
 {
@@ -100,7 +108,7 @@ main (int argc, char *argv[])
 
     for (repeat = 0; repeat < 100000; repeat++)
       {
-        unsigned int operation = RANDOM (3);
+        unsigned int operation = RANDOM (4);
         switch (operation)
           {
           case 0:
@@ -121,6 +129,32 @@ main (int argc, char *argv[])
               ASSERT (gl_oset_remove (set1, obj) == gl_oset_remove (set2, obj));
             }
             break;
+          case 3:
+            {
+              const char *obj = RANDOM_OBJECT ();
+              gl_oset_iterator_t iter1 = gl_oset_iterator_atleast (set1, is_at_least, obj);
+              gl_oset_iterator_t iter2 = gl_oset_iterator_atleast (set2, is_at_least, obj);
+              const void *elt1;
+              const void *elt2;
+              /* Check the first two values that the iterator produces.
+                 Checking them all would make this part of the test dominate the
+                 run time of the test.  */
+              bool havenext1 = gl_oset_iterator_next (&iter1, &elt1);
+              bool havenext2 = gl_oset_iterator_next (&iter2, &elt2);
+              ASSERT (havenext1 == havenext2);
+              if (havenext1)
+                {
+                  ASSERT (elt1 == elt2);
+                  havenext1 = gl_oset_iterator_next (&iter1, &elt1);
+                  havenext2 = gl_oset_iterator_next (&iter2, &elt2);
+                  ASSERT (havenext1 == havenext2);
+                  if (havenext1)
+                    ASSERT (elt1 == elt2);
+                }
+              gl_oset_iterator_free (&iter1);
+              gl_oset_iterator_free (&iter2);
+            }
+            break;
           }
         check_all (set1, set2);
       }
@@ -128,6 +162,8 @@ main (int argc, char *argv[])
     gl_oset_free (set1);
     gl_oset_free (set2);
   }
+
+  test_update (GL_AVLTREE_OSET);
 
   return 0;
 }

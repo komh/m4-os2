@@ -1,5 +1,5 @@
 /* Test of create_pipe_bidi/wait_subprocess.
-   Copyright (C) 2009-2016 Free Software Foundation, Inc.
+   Copyright (C) 2009-2021 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, see <http://www.gnu.org/licenses/>.  */
+   along with this program; if not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
@@ -44,15 +44,15 @@ static void
 test_pipe (const char *prog, bool stderr_closed)
 {
   int fd[2];
-  char *argv[3];
+  const char *argv[3];
   pid_t pid;
   char buffer[2] = { 'a', 't' };
 
   /* Set up child.  */
-  argv[0] = (char *) prog;
-  argv[1] = (char *) (stderr_closed ? "1" : "0");
+  argv[0] = prog;
+  argv[1] = (stderr_closed ? "1" : "0");
   argv[2] = NULL;
-  pid = create_pipe_bidi (prog, prog, argv, false, true, true, fd);
+  pid = create_pipe_bidi (prog, prog, argv, NULL, false, true, true, fd);
   ASSERT (0 <= pid);
   ASSERT (STDERR_FILENO < fd[0]);
   ASSERT (STDERR_FILENO < fd[1]);

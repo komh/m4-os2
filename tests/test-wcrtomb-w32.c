@@ -1,5 +1,5 @@
 /* Test of conversion of wide character to multibyte character.
-   Copyright (C) 2008-2016 Free Software Foundation, Inc.
+   Copyright (C) 2008-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
@@ -23,9 +23,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "localcharset.h"
 #include "macros.h"
 
-#if (defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__
+#if defined _WIN32 && !defined __CYGWIN__
 
 static int
 test_one_locale (const char *name, int codepage)
@@ -257,6 +258,8 @@ test_one_locale (const char *name, int codepage)
 
     case 54936:
       /* Locale encoding is CP54936 = GB18030.  */
+      if (strcmp (locale_charset (), "GB18030") != 0)
+        return 77;
       {
         /* Convert "B\250\271\201\060\211\070er": "Büßer" */
         memset (buf, 'x', 8);
@@ -275,6 +278,8 @@ test_one_locale (const char *name, int codepage)
 
     case 65001:
       /* Locale encoding is CP65001 = UTF-8.  */
+      if (strcmp (locale_charset (), "UTF-8") != 0)
+        return 77;
       {
         /* Convert "B\303\274\303\237er": "Büßer" */
         memset (buf, 'x', 8);

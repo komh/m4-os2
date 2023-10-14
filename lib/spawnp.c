@@ -1,4 +1,4 @@
-/* Copyright (C) 2000, 2009-2016 Free Software Foundation, Inc.
+/* Copyright (C) 2000, 2009-2021 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    This program is free software: you can redistribute it and/or modify
@@ -12,7 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
@@ -29,5 +29,6 @@ posix_spawnp (pid_t *pid, const char *file,
               const posix_spawnattr_t *attrp, char *const argv[],
               char *const envp[])
 {
-  return __spawni (pid, file, file_actions, attrp, argv, envp, 1);
+  return __spawni (pid, file, file_actions, attrp,
+                   (const char * const *) argv, (const char * const *) envp, 1);
 }

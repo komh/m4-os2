@@ -9,9 +9,9 @@ dnl @ with or without modifications, as long as this notice
 dnl @ is preserved.
 define(`a', `b')
 dnl @result{}
-«a»
-dnl @result{}«b»
-changequote(`«', `»')
+Â«aÂ»
+dnl @result{}Â«bÂ»
+changequote(`Â«', `Â»')
 dnl @result{}
-«a»
+Â«aÂ»
 dnl @result{}a

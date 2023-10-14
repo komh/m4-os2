@@ -1,5 +1,5 @@
 /* A GNU-like <sched.h>.
-   Copyright (C) 2008-2016 Free Software Foundation, Inc.
+   Copyright (C) 2008-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #ifndef _@GUARD_PREFIX@_SCHED_H
 
@@ -34,16 +34,23 @@
 
 /* Get pid_t.
    This is needed on glibc 2.11 (see
-   glibc bug <http://sourceware.org/bugzilla/show_bug.cgi?id=13198>)
+   glibc bug <https://sourceware.org/bugzilla/show_bug.cgi?id=13198>)
    and Mac OS X 10.5.  */
 #include <sys/types.h>
 
 #ifdef __KLIBC__
-
-/* On OS/2 kLIBC, struct sched_param is in spawn.h */
+/* On OS/2 kLIBC, struct sched_param is in spawn.h.  */
 # include <spawn.h>
-
 #endif
+
+#ifdef __VMS
+/* On OpenVMS, struct sched_param is in <pthread.h>.  */
+# include <pthread.h>
+#endif
+
+/* The definitions of _GL_FUNCDECL_RPL etc. are copied here.  */
+
+/* The definition of _GL_WARN_ON_USE is copied here.  */
 
 #if !@HAVE_STRUCT_SCHED_PARAM@
 
@@ -61,6 +68,31 @@ struct sched_param
 # define SCHED_FIFO   1
 # define SCHED_RR     2
 # define SCHED_OTHER  0
+#endif
+
+#if @GNULIB_SCHED_YIELD@
+# if @REPLACE_SCHED_YIELD@
+#  if !(defined __cplusplus && defined GNULIB_NAMESPACE)
+#   undef sched_yield
+#   define sched_yield rpl_sched_yield
+#  endif
+_GL_FUNCDECL_RPL (sched_yield, int, (void));
+_GL_CXXALIAS_RPL (sched_yield, int, (void));
+# else
+#  if !@HAVE_SCHED_YIELD@
+_GL_FUNCDECL_SYS (sched_yield, int, (void));
+#  endif
+_GL_CXXALIAS_SYS (sched_yield, int, (void));
+# endif
+# if __GLIBC__ >= 2
+_GL_CXXALIASWARN (sched_yield);
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef sched_yield
+# if HAVE_RAW_DECL_SCHED_YIELD
+_GL_WARN_ON_USE (sched_yield, "sched_yield is not portable - "
+                 "use gnulib module sched_yield for portability");
+# endif
 #endif
 
 #endif /* _@GUARD_PREFIX@_SCHED_H */

@@ -1,5 +1,5 @@
 /* Test of <stdlib.h> substitute in C++ mode.
-   Copyright (C) 2010-2016 Free Software Foundation, Inc.
+   Copyright (C) 2010-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Bruno Haible <bruno@clisp.org>, 2010.  */
 
@@ -28,6 +28,10 @@
 SIGNATURE_CHECK (GNULIB_NAMESPACE::_Exit, void, (int));
 #endif
 
+#if GNULIB_TEST_ALIGNED_ALLOC && HAVE_ALIGNED_ALLOC
+SIGNATURE_CHECK (GNULIB_NAMESPACE::aligned_alloc, void *, (size_t, size_t));
+#endif
+
 //SIGNATURE_CHECK (GNULIB_NAMESPACE::atexit, int, (void (*) (void)));
 
 #if GNULIB_TEST_ATOLL
@@ -41,6 +45,10 @@ SIGNATURE_CHECK (GNULIB_NAMESPACE::calloc, void *, (size_t, size_t));
 #if GNULIB_TEST_CANONICALIZE_FILE_NAME
 SIGNATURE_CHECK (GNULIB_NAMESPACE::canonicalize_file_name, char *,
                  (const char *));
+#endif
+
+#if GNULIB_TEST_FREE_POSIX
+SIGNATURE_CHECK (GNULIB_NAMESPACE::free, void, (void *));
 #endif
 
 #if GNULIB_TEST_GETLOADAVG
@@ -85,12 +93,48 @@ SIGNATURE_CHECK (GNULIB_NAMESPACE::mkstemp, int, (char *));
 SIGNATURE_CHECK (GNULIB_NAMESPACE::mkstemps, int, (char *, int));
 #endif
 
+#if GNULIB_TEST_POSIX_MEMALIGN && HAVE_POSIX_MEMALIGN
+SIGNATURE_CHECK (GNULIB_NAMESPACE::posix_memalign, int,
+                 (void **, size_t, size_t));
+#endif
+
+#if GNULIB_TEST_POSIX_OPENPT
+SIGNATURE_CHECK (GNULIB_NAMESPACE::posix_openpt, int, (int));
+#endif
+
 #if GNULIB_TEST_PTSNAME
 SIGNATURE_CHECK (GNULIB_NAMESPACE::ptsname, char *, (int));
 #endif
 
+#if GNULIB_TEST_PTSNAME_R
+SIGNATURE_CHECK (GNULIB_NAMESPACE::ptsname_r, int, (int, char *, size_t));
+#endif
+
 #if GNULIB_TEST_PUTENV
 SIGNATURE_CHECK (GNULIB_NAMESPACE::putenv, int, (char *));
+#endif
+
+#if GNULIB_TEST_QSORT_R
+SIGNATURE_CHECK (GNULIB_NAMESPACE::qsort_r, void,
+                 (void *, size_t, size_t,
+                  int (*) (void const *, void const *, void *), void *));
+#endif
+
+#if GNULIB_TEST_RANDOM
+SIGNATURE_CHECK (GNULIB_NAMESPACE::random, long, (void));
+#endif
+
+#if GNULIB_TEST_RANDOM
+SIGNATURE_CHECK (GNULIB_NAMESPACE::srandom, void, (unsigned int));
+#endif
+
+#if GNULIB_TEST_RANDOM
+SIGNATURE_CHECK (GNULIB_NAMESPACE::initstate, char *,
+                 (unsigned int, char *, size_t));
+#endif
+
+#if GNULIB_TEST_RANDOM
+SIGNATURE_CHECK (GNULIB_NAMESPACE::setstate, char *, (char *));
 #endif
 
 #if GNULIB_TEST_RANDOM_R
@@ -123,6 +167,10 @@ SIGNATURE_CHECK (GNULIB_NAMESPACE::realpath, char *, (const char *, char *));
 
 #if GNULIB_TEST_RPMATCH
 SIGNATURE_CHECK (GNULIB_NAMESPACE::rpmatch, int, (const char *));
+#endif
+
+#if GNULIB_TEST_SECURE_GETENV
+SIGNATURE_CHECK (GNULIB_NAMESPACE::secure_getenv, char *, (char const *));
 #endif
 
 #if GNULIB_TEST_SETENV

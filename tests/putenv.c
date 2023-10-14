@@ -1,4 +1,4 @@
-/* Copyright (C) 1991, 1994, 1997-1998, 2000, 2003-2016 Free Software
+/* Copyright (C) 1991, 1994, 1997-1998, 2000, 2003-2021 Free Software
    Foundation, Inc.
 
    NOTE: The canonical source of this file is maintained with the GNU C
@@ -15,7 +15,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
@@ -34,7 +34,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
+#if defined _WIN32 && ! defined __CYGWIN__
 # define WIN32_LEAN_AND_MEAN
 # include <windows.h>
 #endif
@@ -58,6 +58,12 @@ __libc_lock_define_initialized (static, envlock)
 # define UNLOCK
 #endif
 
+#if defined _WIN32 && ! defined __CYGWIN__
+/* Don't assume that UNICODE is not defined.  */
+# undef SetEnvironmentVariable
+# define SetEnvironmentVariable SetEnvironmentVariableA
+#endif
+
 static int
 _unsetenv (const char *name)
 {
@@ -76,15 +82,13 @@ _unsetenv (const char *name)
 
 #if HAVE_DECL__PUTENV
   {
-    int putenv_result, putenv_errno;
+    int putenv_result;
     char *name_ = malloc (len + 2);
     memcpy (name_, name, len);
     name_[len] = '=';
     name_[len + 1] = 0;
     putenv_result = _putenv (name_);
-    putenv_errno = errno;
     free (name_);
-    __set_errno (putenv_errno);
     return putenv_result;
   }
 #else
@@ -138,7 +142,7 @@ putenv (char *string)
       /* _putenv ("NAME=") unsets NAME, so invoke _putenv ("NAME= ")
          to allocate the environ vector and then replace the new
          entry with "NAME=".  */
-      int putenv_result, putenv_errno;
+      int putenv_result;
       char *name_x = malloc (name_end - string + sizeof "= ");
       if (!name_x)
         return -1;
@@ -146,25 +150,23 @@ putenv (char *string)
       name_x[name_end - string + 1] = ' ';
       name_x[name_end - string + 2] = 0;
       putenv_result = _putenv (name_x);
-      putenv_errno = errno;
       for (ep = environ; *ep; ep++)
         if (strcmp (*ep, name_x) == 0)
           {
             *ep = string;
             break;
           }
-# if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
+# if defined _WIN32 && ! defined __CYGWIN__
       if (putenv_result == 0)
         {
           /* _putenv propagated "NAME= " into the subprocess environment;
              fix that by calling SetEnvironmentVariable directly.  */
           name_x[name_end - string] = 0;
           putenv_result = SetEnvironmentVariable (name_x, "") ? 0 : -1;
-          putenv_errno = ENOMEM; /* ENOMEM is the only way to fail.  */
+          errno = ENOMEM; /* ENOMEM is the only way to fail.  */
         }
 # endif
       free (name_x);
-      __set_errno (putenv_errno);
       return putenv_result;
     }
 #else

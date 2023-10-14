@@ -1,6 +1,6 @@
 # Configure template for GNU M4.           -*-Autoconf-*-
-# Copyright (C) 1991, 1993-1994, 2004-2014, 2016 Free Software
-# Foundation, Inc.
+# Copyright (C) 1991, 1993-1994, 2004-2014, 2016-2017, 2020-2021 Free
+# Software Foundation, Inc.
 #
 # This file is part of GNU M4.
 #
@@ -15,9 +15,9 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-AC_PREREQ([2.62])
+AC_PREREQ([2.64])
 AC_INIT([GNU M4], m4_esyscmd([build-aux/git-version-gen .tarball-version]),
   [bug-m4@gnu.org])
 AC_CONFIG_AUX_DIR([build-aux])
@@ -42,6 +42,9 @@ gl_ASSERT_NO_GNULIB_POSIXCHECK
 
 # M4 is single-threaded; so we can optimize gnulib code by using this:
 gl_DISABLE_THREADS
+AC_DEFINE([GNULIB_REGEX_SINGLE_THREAD], [1], [Define to optimize regex.])
+AC_DEFINE([GNULIB_MBRTOWC_SINGLE_THREAD], [1], [Define to optimize mbrtowc.])
+AC_DEFINE([GNULIB_WCHAR_SINGLE_LOCALE], [1], [Define to optimize mbrtowc.])
 
 AC_ARG_ENABLE([gcc-warnings],
   [AS_HELP_STRING([--enable-gcc-warnings],
@@ -83,6 +86,7 @@ if test "$gl_gcc_warnings" = yes; then
   nw="$nw -Wundef"                  # K&R is anachronistic
   nw="$nw -Wtraditional"            # K&R is anachronistic
   nw="$nw -Wlong-long"              # C90 is anachronistic
+  nw="$nw -Wvla"		    # gettext's use of VLAs is safe
   nw="$nw -Wsystem-headers"         # Don't let system headers trigger warnings
   nw="$nw -Wpadded"                 # Our structs are not packed
   nw="$nw -Wconversion"             # Too many warnings for now
@@ -221,9 +225,13 @@ AC_CONFIG_COMMANDS([stamp-h], [[test -z "$CONFIG_HEADERS" || date > stamp-h]])
 AS_CASE([$host], [*-*-os2*], [OS2_LDFLAGS="-Zargs-resp"])
 AC_SUBST([OS2_LDFLAGS])
 
+AM_GNU_GETTEXT([external], [need-formatstring-macros])
+AM_GNU_GETTEXT_VERSION([0.19.2])
+
 AC_CONFIG_FILES([Makefile
                  doc/Makefile
                  lib/Makefile
+		 po/Makefile.in
                  src/Makefile
                  tests/Makefile
                  checks/Makefile

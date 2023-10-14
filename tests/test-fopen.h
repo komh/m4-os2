@@ -1,5 +1,5 @@
 /* Test of opening a file stream.
-   Copyright (C) 2007-2016 Free Software Foundation, Inc.
+   Copyright (C) 2007-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Bruno Haible <bruno@clisp.org>, 2007.  */
 
@@ -47,6 +47,10 @@ test_fopen (void)
   ASSERT (fopen (BASE "file/", "r") == NULL);
   ASSERT (errno == ENOTDIR || errno == EISDIR || errno == EINVAL);
 
+  errno = 0;
+  ASSERT (fopen (BASE "file/", "r+") == NULL);
+  ASSERT (errno == ENOTDIR || errno == EISDIR || errno == EINVAL);
+
   /* Cannot create a directory.  */
   errno = 0;
   ASSERT (fopen ("nonexist.ent/", "w") == NULL);
@@ -56,6 +60,18 @@ test_fopen (void)
   /* Directories cannot be opened for writing.  */
   errno = 0;
   ASSERT (fopen (".", "w") == NULL);
+  ASSERT (errno == EISDIR || errno == EINVAL || errno == EACCES);
+
+  errno = 0;
+  ASSERT (fopen ("./", "w") == NULL);
+  ASSERT (errno == EISDIR || errno == EINVAL || errno == EACCES);
+
+  errno = 0;
+  ASSERT (fopen (".", "r+") == NULL);
+  ASSERT (errno == EISDIR || errno == EINVAL || errno == EACCES);
+
+  errno = 0;
+  ASSERT (fopen ("./", "r+") == NULL);
   ASSERT (errno == EISDIR || errno == EINVAL || errno == EACCES);
 
   /* /dev/null must exist, and be writable.  */

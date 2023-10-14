@@ -1,5 +1,5 @@
 /* Test raising a signal.
-   Copyright (C) 2011-2016 Free Software Foundation, Inc.
+   Copyright (C) 2011-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,11 +12,12 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
 #include <signal.h>
+#include <unistd.h>
 
 #include "signature.h"
 SIGNATURE_CHECK (raise, int, (int));
@@ -31,7 +32,7 @@ SIGNATURE_CHECK (raise, int, (int));
 static _Noreturn void
 handler (int sig)
 {
-  exit (0);
+  _exit (0);
 }
 
 int

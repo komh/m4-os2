@@ -1,5 +1,5 @@
 /* Test of conversion of multibyte character to wide character.
-   Copyright (C) 2008-2016 Free Software Foundation, Inc.
+   Copyright (C) 2008-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
@@ -24,9 +24,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "localcharset.h"
 #include "macros.h"
 
-#if (defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__
+#if defined _WIN32 && !defined __CYGWIN__
 
 static int
 test_one_locale (const char *name, int codepage)
@@ -325,14 +326,12 @@ test_one_locale (const char *name, int codepage)
         memset (&state, '\0', sizeof (mbstate_t));
         wc = (wchar_t) 0xBADFACE;
         ret = mbrtowc (&wc, "\377", 1, &state); /* 0xFF */
-        ASSERT (ret == (size_t)-1);
-        ASSERT (errno == EILSEQ);
+        ASSERT ((ret == (size_t)-1 && errno == EILSEQ) || ret == (size_t)-2);
 
         memset (&state, '\0', sizeof (mbstate_t));
         wc = (wchar_t) 0xBADFACE;
         ret = mbrtowc (&wc, "\225\377", 2, &state); /* 0x95 0xFF */
-        ASSERT (ret == (size_t)-1);
-        ASSERT (errno == EILSEQ);
+        ASSERT ((ret == (size_t)-1 && errno == EILSEQ) || (ret == 2 && wc == 0x30FB));
       }
       return 0;
 
@@ -397,14 +396,12 @@ test_one_locale (const char *name, int codepage)
         memset (&state, '\0', sizeof (mbstate_t));
         wc = (wchar_t) 0xBADFACE;
         ret = mbrtowc (&wc, "\377", 1, &state); /* 0xFF */
-        ASSERT (ret == (size_t)-1);
-        ASSERT (errno == EILSEQ);
+        ASSERT ((ret == (size_t)-1 && errno == EILSEQ) || ret == (size_t)-2);
 
         memset (&state, '\0', sizeof (mbstate_t));
         wc = (wchar_t) 0xBADFACE;
         ret = mbrtowc (&wc, "\225\377", 2, &state); /* 0x95 0xFF */
-        ASSERT (ret == (size_t)-1);
-        ASSERT (errno == EILSEQ);
+        ASSERT ((ret == (size_t)-1 && errno == EILSEQ) || (ret == 2 && wc == '?'));
       }
       return 0;
 
@@ -469,19 +466,19 @@ test_one_locale (const char *name, int codepage)
         memset (&state, '\0', sizeof (mbstate_t));
         wc = (wchar_t) 0xBADFACE;
         ret = mbrtowc (&wc, "\377", 1, &state); /* 0xFF */
-        ASSERT (ret == (size_t)-1);
-        ASSERT (errno == EILSEQ);
+        ASSERT ((ret == (size_t)-1 && errno == EILSEQ) || ret == (size_t)-2);
 
         memset (&state, '\0', sizeof (mbstate_t));
         wc = (wchar_t) 0xBADFACE;
         ret = mbrtowc (&wc, "\225\377", 2, &state); /* 0x95 0xFF */
-        ASSERT (ret == (size_t)-1);
-        ASSERT (errno == EILSEQ);
+        ASSERT ((ret == (size_t)-1 && errno == EILSEQ) || (ret == 2 && wc == '?'));
       }
       return 0;
 
     case 54936:
       /* Locale encoding is CP54936 = GB18030.  */
+      if (strcmp (locale_charset (), "GB18030") != 0)
+        return 77;
       {
         char input[] = "B\250\271\201\060\211\070er"; /* "Büßer" */
         memset (&state, '\0', sizeof (mbstate_t));
@@ -529,7 +526,7 @@ test_one_locale (const char *name, int codepage)
         ASSERT (ret == 1);
         ASSERT (wc == 'e');
         ASSERT (mbsinit (&state));
-        input[5] = '\0';
+        input[7] = '\0';
 
         wc = (wchar_t) 0xBADFACE;
         ret = mbrtowc (&wc, input + 8, 1, &state);
@@ -578,6 +575,8 @@ test_one_locale (const char *name, int codepage)
 
     case 65001:
       /* Locale encoding is CP65001 = UTF-8.  */
+      if (strcmp (locale_charset (), "UTF-8") != 0)
+        return 77;
       {
         char input[] = "B\303\274\303\237er"; /* "Büßer" */
         memset (&state, '\0', sizeof (mbstate_t));

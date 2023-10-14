@@ -1,7 +1,7 @@
 ;;; Boxed comments for C mode.
-;;; Copyright (C) 1991-1994, 2008-2014, 2016 Free Software Foundation,
-;;; Inc.
-;;; Francois Pinard <pinard@iro.umontreal.ca>, April 1991.
+;;; Copyright (C) 1991-1994, 2008-2014, 2016-2017, 2020-2021 Free
+;;; Software Foundation, Inc.
+;;; François Pinard <pinard@iro.umontreal.ca>, April 1991.
 ;;;
 ;;; This file is part of GNU M4.
 ;;;
@@ -16,7 +16,7 @@
 ;;; GNU General Public License for more details.
 ;;;
 ;;; You should have received a copy of the GNU General Public License
-;;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; I often refill paragraphs inside C comments, while stretching or
 ;;; shrinking the surrounding box as needed.  This is a real pain to

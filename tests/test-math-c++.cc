@@ -1,5 +1,5 @@
 /* Test of <math.h> substitute in C++ mode.
-   Copyright (C) 2010-2016 Free Software Foundation, Inc.
+   Copyright (C) 2010-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Bruno Haible <bruno@clisp.org>, 2010.  */
 
@@ -163,6 +163,17 @@ SIGNATURE_CHECK (GNULIB_NAMESPACE::floor, double, (double));
 SIGNATURE_CHECK (GNULIB_NAMESPACE::floorl, long double, (long double));
 #endif
 
+#if GNULIB_TEST_FMAF
+SIGNATURE_CHECK (GNULIB_NAMESPACE::fmaf, float, (float, float, float));
+#endif
+#if GNULIB_TEST_FMA
+SIGNATURE_CHECK (GNULIB_NAMESPACE::fma, double, (double, double, double));
+#endif
+#if GNULIB_TEST_FMAL
+SIGNATURE_CHECK (GNULIB_NAMESPACE::fmal, long double,
+                 (long double, long double, long double));
+#endif
+
 #if GNULIB_TEST_FMODF
 SIGNATURE_CHECK (GNULIB_NAMESPACE::fmodf, float, (float, float));
 #endif
@@ -221,6 +232,19 @@ SIGNATURE_CHECK (GNULIB_NAMESPACE::ldexpl, long double, (long double, int));
 
 //SIGNATURE_CHECK (GNULIB_NAMESPACE::lgamma, double, (double));
 
+#if GNULIB_TEST_LOGF
+SIGNATURE_CHECK (GNULIB_NAMESPACE::logf, float, (float));
+#endif
+#if GNULIB_TEST_LOG
+SIGNATURE_CHECK (GNULIB_NAMESPACE::log, double, (double));
+#endif
+#if GNULIB_TEST_LOGL
+SIGNATURE_CHECK (GNULIB_NAMESPACE::logl, long double, (long double));
+#endif
+
+#if GNULIB_TEST_LOG10F
+SIGNATURE_CHECK (GNULIB_NAMESPACE::log10f, float, (float));
+#endif
 #if GNULIB_TEST_LOG10
 SIGNATURE_CHECK (GNULIB_NAMESPACE::log10, double, (double));
 #endif
@@ -236,20 +260,6 @@ SIGNATURE_CHECK (GNULIB_NAMESPACE::log1p, double, (double));
 #endif
 #if GNULIB_TEST_LOG1PL
 SIGNATURE_CHECK (GNULIB_NAMESPACE::log1pl, long double, (long double));
-#endif
-
-#if GNULIB_TEST_LOGF
-SIGNATURE_CHECK (GNULIB_NAMESPACE::logf, float, (float));
-#endif
-#if GNULIB_TEST_LOG
-SIGNATURE_CHECK (GNULIB_NAMESPACE::log, double, (double));
-#endif
-#if GNULIB_TEST_LOGL
-SIGNATURE_CHECK (GNULIB_NAMESPACE::logl, long double, (long double));
-#endif
-
-#if GNULIB_TEST_LOG10F
-SIGNATURE_CHECK (GNULIB_NAMESPACE::log10f, float, (float));
 #endif
 
 #if GNULIB_TEST_LOG2F
@@ -373,30 +383,30 @@ SIGNATURE_CHECK (GNULIB_NAMESPACE::truncl, long double, (long double));
 
 #if GNULIB_TEST_ISFINITE
 # ifdef isfinite
-#  error "isfinite should not be a macro in C++"
+#  warning "isfinite should not be a macro in C++"
 # endif
-REAL_FLOATING_CHECK (isfinite, int, (float), int, (double), int, (long double));
+REAL_FLOATING_CHECK (isfinite, bool, (float), bool, (double), bool, (long double));
 #endif
 
 #if GNULIB_TEST_ISINF
 # ifdef isinf
-#  error "isinf should not be a macro in C++"
+#  warning "isinf should not be a macro in C++"
 # endif
-REAL_FLOATING_CHECK (isinf, int, (float), int, (double), int, (long double));
+REAL_FLOATING_CHECK (isinf, bool, (float), bool, (double), bool, (long double));
 #endif
 
 #if GNULIB_TEST_ISNAN
 # ifdef isnan
-#  error "isnan should not be a macro in C++"
+#  warning "isnan should not be a macro in C++"
 # endif
-REAL_FLOATING_CHECK (isnan, int, (float), int, (double), int, (long double));
+REAL_FLOATING_CHECK (isnan, bool, (float), bool, (double), bool, (long double));
 #endif
 
 #if GNULIB_TEST_SIGNBIT
 # ifdef signbit
-#  error "signbit should not be a macro in C++"
+#  warning "signbit should not be a macro in C++"
 # endif
-REAL_FLOATING_CHECK (signbit, int, (float), int, (double), int, (long double));
+REAL_FLOATING_CHECK (signbit, bool, (float), bool, (double), bool, (long double));
 #endif
 
 

@@ -1,7 +1,7 @@
 /* GNU m4 -- A simple macro processor
 
-   Copyright (C) 1991-1994, 2004, 2006-2007, 2009-2014, 2016 Free
-   Software Foundation, Inc.
+   Copyright (C) 1991-1994, 2004, 2006-2007, 2009-2014, 2016-2017,
+   2020-2021 Free Software Foundation, Inc.
 
    This file is part of GNU M4.
 
@@ -16,7 +16,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "m4.h"
@@ -133,7 +133,7 @@ debug_set_file (FILE *fp)
   if (debug != NULL && debug != stderr && debug != stdout
       && close_stream (debug) != 0)
     {
-      M4ERROR ((warning_status, errno, "error writing to debug stream"));
+      M4ERROR ((warning_status, errno, _("error writing to debug stream")));
       retcode = EXIT_FAILURE;
     }
   debug = fp;
@@ -154,7 +154,7 @@ debug_set_file (FILE *fp)
           if (debug != stderr && close_stream (debug) != 0)
             {
               M4ERROR ((warning_status, errno,
-                        "error writing to debug stream"));
+                        _("error writing to debug stream")));
               retcode = EXIT_FAILURE;
             }
           debug = stdout;
@@ -210,13 +210,9 @@ debug_set_output (const char *name)
     debug_set_file (NULL);
   else
     {
-      fp = fopen (name, "a");
+      fp = fopen (name, "ae");
       if (fp == NULL)
         return false;
-
-      if (set_cloexec_flag (fileno (fp), true) != 0)
-        M4ERROR ((warning_status, errno,
-                  "Warning: cannot protect debug file across forks"));
       debug_set_file (fp);
     }
   return true;
@@ -279,8 +275,7 @@ trace_format (const char *fmt, ...)
         {
         case 'S':
           maxlen = max_debug_argument_length;
-          /* fall through */
-
+          FALLTHROUGH;
         case 's':
           s = va_arg (args, const char *);
           break;

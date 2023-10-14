@@ -1,7 +1,7 @@
 /* GNU m4 -- A simple macro processor
 
-   Copyright (C) 1989-1994, 2004-2014, 2016 Free Software Foundation,
-   Inc.
+   Copyright (C) 1989-1994, 2004-2014, 2016-2017, 2020-2021 Free
+   Software Foundation, Inc.
 
    This file is part of GNU M4.
 
@@ -16,7 +16,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "m4.h"
@@ -26,17 +26,21 @@
 #include <signal.h>
 
 #include "c-stack.h"
+#include "configmake.h"
 #include "ignore-value.h"
 #include "progname.h"
+#include "propername.h"
 #include "version-etc.h"
 
 #ifdef DEBUG_STKOVF
 # include "assert.h"
 #endif
 
-#define AUTHORS "Rene' Seindal"
+/* TRANSLATORS: This is a non-ASCII name: The first name is (with
+   Unicode escapes) "Ren\u00e9" or (with HTML entities) "Ren&eacute;".  */
+#define AUTHORS proper_name_utf8 ("Rene' Seindal", "Ren\xC3\xA9 Seindal")
 
-static void usage (int) M4_GNUC_NORETURN;
+static _Noreturn void usage (int);
 
 /* Enable sync output for /lib/cpp (-s).  */
 int sync_output = 0;
@@ -103,6 +107,16 @@ m4_error (int status, int errnum, const char *format, ...)
   va_end (args);
 }
 
+void
+m4_failure (int errnum, const char *format, ...)
+{
+  va_list args;
+  va_start (args, format);
+  verror_at_line (EXIT_FAILURE, errnum, current_line ? current_file : NULL,
+                  current_line, format, args);
+  assume (false);
+}
+
 /*-------------------------------.
 | Wrapper around error_at_line.  |
 `-------------------------------*/
@@ -117,6 +131,17 @@ m4_error_at_line (int status, int errnum, const char *file, int line,
   if (fatal_warnings && ! retcode)
     retcode = EXIT_FAILURE;
   va_end (args);
+}
+
+void
+m4_failure_at_line (int errnum, const char *file, int line,
+                    const char *format, ...)
+{
+  va_list args;
+  va_start (args, format);
+  verror_at_line (EXIT_FAILURE, errnum, line ? file : NULL,
+                  line, format, args);
+  assume (false);
 }
 
 #ifndef SIGBUS
@@ -141,7 +166,7 @@ static const char * volatile signal_message[NSIG];
    must be aysnc-signal safe, since it is executed as a signal
    handler.  If SIGNO is zero, this represents a stack overflow; in
    that case, we return to allow c_stack_action to handle things.  */
-static void M4_GNUC_PURE
+static void
 fault_handler (int signo)
 {
   if (signo)
@@ -178,46 +203,54 @@ static void
 usage (int status)
 {
   if (status != EXIT_SUCCESS)
-    xfprintf (stderr, "Try `%s --help' for more information.\n", program_name);
+    {
+      xfprintf (stderr, _("Try `%s --help' for more information."),
+                program_name);
+      fputs ("\n", stderr);
+    }
   else
     {
-      xprintf ("Usage: %s [OPTION]... [FILE]...\n", program_name);
-      fputs ("\
+      xprintf (_("Usage: %s [OPTION]... [FILE]...\n"), program_name);
+      fputs (_("\
 Process macros in FILEs.  If no FILE or if FILE is `-', standard input\n\
 is read.\n\
-", stdout);
-      fputs ("\
-\n\
+"), stdout);
+      puts ("");
+      fputs (_("\
 Mandatory or optional arguments to long options are mandatory or optional\n\
 for short options too.\n\
-\n\
+"), stdout);
+      puts ("");
+      fputs (_("\
 Operation modes:\n\
       --help                   display this help and exit\n\
       --version                output version information and exit\n\
-", stdout);
-      xprintf ("\
+"), stdout);
+      fputs (_("\
   -E, --fatal-warnings         once: warnings become errors, twice: stop\n\
                                  execution at first error\n\
   -i, --interactive            unbuffer output, ignore interrupts\n\
   -P, --prefix-builtins        force a `m4_' prefix to all builtins\n\
   -Q, --quiet, --silent        suppress some warnings for builtins\n\
+"), stdout);
+      xprintf (_("\
       --warn-macro-sequence[=REGEXP]\n\
                                warn if macro definition matches REGEXP,\n\
                                  default %s\n\
-", DEFAULT_MACRO_SEQUENCE);
+"), DEFAULT_MACRO_SEQUENCE);
 #ifdef ENABLE_CHANGEWORD
-      fputs ("\
+      fputs (_("\
   -W, --word-regexp=REGEXP     use REGEXP for macro name syntax\n\
-", stdout);
+"), stdout);
 #endif
-      fputs ("\
-\n\
+      puts ("");
+      fputs (_("\
 Preprocessor features:\n\
   -D, --define=NAME[=VALUE]    define NAME as having VALUE, or empty\n\
   -I, --include=DIRECTORY      append DIRECTORY to include path\n\
   -s, --synclines              generate `#line NUM \"FILE\"' lines\n\
   -U, --undefine=NAME          undefine NAME\n\
-", stdout);
+"), stdout);
       puts ("");
       xprintf (_("\
 Limits control:\n\
@@ -227,45 +260,47 @@ Limits control:\n\
   -L, --nesting-limit=NUMBER   change nesting limit, 0 for unlimited [%d]\n\
 "), nesting_limit);
       puts ("");
-      fputs ("\
+      fputs (_("\
 Frozen state files:\n\
   -F, --freeze-state=FILE      produce a frozen state on FILE at end\n\
   -R, --reload-state=FILE      reload a frozen state from FILE at start\n\
-", stdout);
-      fputs ("\
-\n\
+"), stdout);
+      puts ("");
+      fputs (_("\
 Debugging:\n\
   -d, --debug[=FLAGS]          set debug level (no FLAGS implies `aeq')\n\
       --debugfile[=FILE]       redirect debug and trace output to FILE\n\
                                  (default stderr, discard if empty string)\n\
   -l, --arglength=NUM          restrict macro tracing size\n\
   -t, --trace=NAME             trace NAME when it is defined\n\
-", stdout);
-      fputs ("\
-\n\
+"), stdout);
+      puts ("");
+      fputs (_("\
 FLAGS is any of:\n\
   a   show actual arguments\n\
   c   show before collect, after collect and after call\n\
   e   show expansion\n\
   f   say current input file name\n\
   i   show changes in input files\n\
+"), stdout);
+      fputs (_("\
   l   say current input line number\n\
   p   show results of path searches\n\
   q   quote values as necessary, with a or e flag\n\
   t   trace for all macro calls, not only traceon'ed\n\
   x   add a unique macro call id, useful with c flag\n\
   V   shorthand for all of the above flags\n\
-", stdout);
-      fputs ("\
-\n\
+"), stdout);
+      puts ("");
+      fputs (_("\
 If defined, the environment variable `M4PATH' is a colon-separated list\n\
 of directories included after any specified by `-I'.\n\
-", stdout);
-      fputs ("\
-\n\
+"), stdout);
+      puts ("");
+      fputs (_("\
 Exit status is 0 for success, 1 for failure, 63 for frozen file version\n\
 mismatch, or whatever value was passed to the m4exit macro.\n\
-", stdout);
+"), stdout);
       emit_bug_reporting_address ();
     }
   exit (status);
@@ -383,6 +418,9 @@ main (int argc, char *const *argv)
 
   set_program_name (argv[0]);
   retcode = EXIT_SUCCESS;
+  setlocale (LC_ALL, "");
+  bindtextdomain (PACKAGE, LOCALEDIR);
+  textdomain (PACKAGE);
   atexit (close_stdin);
 
   include_init ();
@@ -538,7 +576,7 @@ main (int argc, char *const *argv)
 
       case 'e':
         error (0, 0, _("warning: `m4 -e' is deprecated, use `-i' instead"));
-        /* fall through */
+        FALLTHROUGH;
       case 'i':
         interactive = true;
         break;
@@ -584,7 +622,8 @@ main (int argc, char *const *argv)
 
   /* Do the basic initializations.  */
   if (debugfile && !debug_set_output (debugfile))
-    M4ERROR ((warning_status, errno, "cannot set debug file `%s'", debugfile));
+    M4ERROR ((warning_status, errno, _("cannot set debug file `%s'"),
+              debugfile));
 
   input_init ();
   output_init ();
@@ -647,7 +686,7 @@ main (int argc, char *const *argv)
 
         case DEBUGFILE_OPTION:
           if (!debug_set_output (defines->arg))
-            M4ERROR ((warning_status, errno, "cannot set debug file `%s'",
+            M4ERROR ((warning_status, errno, _("cannot set debug file `%s'"),
                       debugfile ? debugfile : _("stderr")));
           break;
 

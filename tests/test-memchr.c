@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2008-2021 Free Software Foundation, Inc.
  * Written by Eric Blake and Bruno Haible
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
@@ -49,7 +49,12 @@ main (void)
   ASSERT (MEMCHR (input, 'a', n) == input);
 
   ASSERT (MEMCHR (input, 'a', 0) == NULL);
-  ASSERT (MEMCHR (zerosize_ptr (), 'a', 0) == NULL);
+
+  {
+    void *page_boundary = zerosize_ptr ();
+    if (page_boundary)
+      ASSERT (MEMCHR (page_boundary, 'a', 0) == NULL);
+  }
 
   ASSERT (MEMCHR (input, 'b', n) == input + 1);
   ASSERT (MEMCHR (input, 'c', n) == input + 2);
@@ -88,7 +93,7 @@ main (void)
 
   /* Check that memchr() does not read past the first occurrence of the
      byte being searched.  See the Austin Group's clarification
-     <http://www.opengroup.org/austin/docs/austin_454.txt>.
+     <https://www.opengroup.org/austin/docs/austin_454.txt>.
      Test both '\0' and something else, since some implementations
      special-case searching for NUL.
   */

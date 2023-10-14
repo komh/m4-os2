@@ -1,5 +1,5 @@
-# frexpl.m4 serial 20
-dnl Copyright (C) 2007-2016 Free Software Foundation, Inc.
+# frexpl.m4 serial 22
+dnl Copyright (C) 2007-2021 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -131,7 +131,7 @@ AC_DEFUN([gl_FUNC_FREXPL_WORKS],
 # undef LDBL_MIN_EXP
 # define LDBL_MIN_EXP    (-16381)
 #endif
-#if defined __i386__ && defined __FreeBSD__
+#if defined __i386__ && (defined __FreeBSD__ || defined __DragonFly__)
 # undef LDBL_MIN_EXP
 # define LDBL_MIN_EXP    (-16381)
 #endif
@@ -150,6 +150,7 @@ extern
 "C"
 #endif
 long double frexpl (long double, int *);
+long double zero = 0.0L;
 int main()
 {
   int result = 0;
@@ -207,7 +208,8 @@ int main()
       }
   }
   /* Test on infinite numbers.  */
-  x = 1.0L / 0.0L;
+  /* The Microsoft MSVC 14 compiler chokes on the expression 1.0 / 0.0.  */
+  x = 1.0L / zero;
   {
     int exp;
     long double y = frexpl (x, &exp);

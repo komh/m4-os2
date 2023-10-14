@@ -1,5 +1,29 @@
 GNU M4 NEWS - User visible changes.
 
+* Noteworthy changes in release 1.4.19 (2021-05-28) [stable]
+
+** A number of portability improvements inherited from gnulib, including
+   the ability to perform stack overflow detection on more platforms
+   without linking to GNU libsigsegv.
+
+* Noteworthy changes in release 1.4.18d (2021-05-11) [beta]
+
+** A number of portability improvements inherited from gnulib.
+
+
+* Noteworthy changes in release 1.4.18b (2021-05-07) [beta]
+
+** The symbol hash table now defaults to 65537 buckets instead of 509, as
+   modern systems have enough memory to benefit from fewer hash collisions
+   by default.
+
+** Introduce the use of gettext, with the immediate benefit of nicer
+   UTF-8 author names.  Over time, more translations of program messages
+   will become available.
+
+** A number of portability improvements inherited from gnulib.
+
+
 * Noteworthy changes in release 1.4.18 (2016-12-31) [stable]
 
 ** Diagnose --word-regexp as unsupported if it was not configured.
@@ -112,7 +136,7 @@ GNU M4 NEWS - User visible changes.
    overflow from other exceptions, such as Linux, you can optionally
    install the libsigsegv library (version 2.6 or newer recommended) to
    enhance m4's ability to accurately report stack overflow:
-   http://www.gnu.org/software/libsigsegv/
+   https://www.gnu.org/software/libsigsegv/
 
 ** A number of portability improvements inherited from gnulib.
 
@@ -635,7 +659,7 @@ detected, then sources are unprotoized on the fly before compilation.
 
 * GNU m4 uses newer versions of obstack, regex, getopt, etc.
 
-Version 1.0 - October 1991, by Rene' Seindal
+Version 1.0 - October 1991, by René Seindal
 
 * Uses GNU configure, taken from the gdb distribution.
 
@@ -648,7 +672,7 @@ or superflous arguments to built-in macros.
 
 * Several minor bugs have been fixed.
 
-Version 0.99 - July 1991, by Rene' Seindal
+Version 0.99 - July 1991, by René Seindal
 
 * The builtins `incr' and `decr' are now implemented without use of
 `eval'.
@@ -677,7 +701,7 @@ available.
 
 * Several typos in the manual has been corrected.  More probably persist.
 
-Version 0.75 - November 1990, by Rene' Seindal
+Version 0.75 - November 1990, by René Seindal
 
 * Implemented search path for include files (-I option and M4PATH
 environment variable).
@@ -710,7 +734,7 @@ not used.  With -G, `unix' is still defined.
 
 * Fixed two missing null bytes bugs.
 
-Version 0.50 - January 1990, by Rene' Seindal
+Version 0.50 - January 1990, by René Seindal
 
 * Initial beta release.
 
@@ -721,7 +745,8 @@ mode: outline
 fill-column: 75
 End:
 
-Copyright (C) 1992-1994, 2004-2014, 2016 Free Software Foundation, Inc.
+Copyright (C) 1992-1994, 2004-2014, 2016-2017, 2020-2021 Free Software
+Foundation, Inc.
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.3 or

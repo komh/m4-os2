@@ -1,5 +1,6 @@
 # Customize maint.mk.                           -*- makefile -*-
-# Copyright (C) 2003-2014, 2016 Free Software Foundation, Inc.
+# Copyright (C) 2003-2014, 2016-2017, 2020-2021 Free Software
+# Foundation, Inc.
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -12,7 +13,7 @@
 # GNU General Public License for more details.
 
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # Used in maint.mk's web-manual rule
 manual_title = GNU macro processor
@@ -33,7 +34,10 @@ local-checks-to-skip += sc_cast_of_x_alloc_return_value
 config_h_header = "m4\.h"
 
 # Hash of NEWS contents, to ensure we don't add entries to wrong section.
-old_NEWS_hash = ef92e5b599b23d9dfe915db5ce4194c5
+old_NEWS_hash = 9f7b57774172e11c4a0a9ea4d2e2effe
+
+# Update m4-latest.tar.* symlinks during 'make stable/beta'.
+GNUPLOADFLAGS = --symlink-regex
 
 # Indent only with spaces.
 sc_prohibit_tab_based_indentation:

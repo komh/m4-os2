@@ -1,7 +1,7 @@
 ## Makefile.am - template for generating Makefile via Automake
 ##
-## Copyright (C) 2000-2001, 2003-2014, 2016 Free Software Foundation,
-## Inc.
+## Copyright (C) 2000-2001, 2003-2014, 2016-2017, 2020-2021 Free
+## Software Foundation, Inc.
 ##
 ## This file is part of GNU M4.
 ##
@@ -16,11 +16,11 @@
 ## GNU General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with this program.  If not, see <http://www.gnu.org/licenses/>.
+## along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ##
 ## Written by Gary V. Vaughan <gary@gnu.org>
 
-SUBDIRS = . examples lib src doc checks tests
+SUBDIRS = . examples lib src doc checks po tests
 
 EXTRA_DIST = bootstrap c-boxes.el cfg.mk maint.mk \
 	.prev-version .version m4/gnulib-cache.m4 ChangeLog-2014

@@ -1,6 +1,7 @@
 ## Makefile.am - template for generating Makefile via Automake
 ##
-## Copyright (C) 2006-2014, 2016 Free Software Foundation, Inc.
+## Copyright (C) 2006-2014, 2016-2017, 2020-2021 Free Software
+## Foundation, Inc.
 ##
 ## This file is part of GNU M4.
 ##
@@ -15,7 +16,7 @@
 ## GNU General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with this program.  If not, see <http://www.gnu.org/licenses/>.
+## along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ##
 ## This file written by Eric Blake <ebb9@byu.net>
 
@@ -27,4 +28,8 @@ bin_PROGRAMS = m4
 noinst_HEADERS = m4.h
 m4_SOURCES = m4.c builtin.c debug.c eval.c format.c freeze.c input.c \
 macro.c output.c path.c symtab.c
-m4_LDADD = ../lib/libm4.a $(LIBM4_LIBDEPS) $(LIBCSTACK) $(LIBTHREAD)
+LDADD = ../lib/libm4.a $(LIBM4_LIBDEPS) \
+  $(LIB_CLOCK_GETTIME) $(LIB_GETRANDOM) $(LIB_HARD_LOCALE) \
+  $(LIB_MBRTOWC) $(LIB_POSIX_SPAWN) $(LIB_SETLOCALE) $(LIB_SETLOCALE_NULL) \
+  $(LIBCSTACK) $(LIBICONV) $(LIBINTL) $(LIBTHREAD) $(LIBUNISTRING) \
+  $(INTL_MACOSX_LIBS)

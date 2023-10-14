@@ -1,5 +1,5 @@
 /* fflush.c -- allow flushing input streams
-   Copyright (C) 2007-2016 Free Software Foundation, Inc.
+   Copyright (C) 2007-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Eric Blake. */
 
@@ -33,7 +33,8 @@
 #undef fflush
 
 
-#if defined _IO_ftrylockfile || __GNU_LIBRARY__ == 1 /* GNU libc, BeOS, Haiku, Linux libc5 */
+#if defined _IO_EOF_SEEN || defined _IO_ftrylockfile || __GNU_LIBRARY__ == 1
+/* GNU libc, BeOS, Haiku, Linux libc5 */
 
 /* Clear the stream's ungetc buffer, preserving the value of ftello (fp).  */
 static void
@@ -51,7 +52,7 @@ static void
 clear_ungetc_buffer (FILE *fp)
 {
 # if defined __sferror || defined __DragonFly__ || defined __ANDROID__
-  /* FreeBSD, NetBSD, OpenBSD, DragonFly, Mac OS X, Cygwin, Android */
+  /* FreeBSD, NetBSD, OpenBSD, DragonFly, Mac OS X, Cygwin, Minix 3, Android */
   if (HASUB (fp))
     {
       fp_->_p += fp_->_r;
@@ -63,7 +64,7 @@ clear_ungetc_buffer (FILE *fp)
       fp->_ungetc_count = 0;
       fp->_rcount = - fp->_rcount;
     }
-# elif defined _IOERR               /* Minix, AIX, HP-UX, IRIX, OSF/1, Solaris, OpenServer, mingw, MSVC, NonStop Kernel */
+# elif defined _IOERR               /* Minix, AIX, HP-UX, IRIX, OSF/1, Solaris, OpenServer, UnixWare, mingw, MSVC, NonStop Kernel, OpenVMS */
   /* Nothing to do.  */
 # else                              /* other implementations */
   fseeko (fp, 0, SEEK_CUR);
@@ -72,10 +73,11 @@ clear_ungetc_buffer (FILE *fp)
 
 #endif
 
-#if ! (defined _IO_ftrylockfile || __GNU_LIBRARY__ == 1 /* GNU libc, BeOS, Haiku, Linux libc5 */)
+#if ! (defined _IO_EOF_SEEN || defined _IO_ftrylockfile || __GNU_LIBRARY__ == 1)
+/* GNU libc, BeOS, Haiku, Linux libc5 */
 
 # if (defined __sferror || defined __DragonFly__ || defined __ANDROID__) && defined __SNPT
-/* FreeBSD, NetBSD, OpenBSD, DragonFly, Mac OS X, Cygwin, Android */
+/* FreeBSD, NetBSD, OpenBSD, DragonFly, Mac OS X, Cygwin, Minix 3, Android */
 
 static int
 disable_seek_optimization (FILE *fp)
@@ -98,7 +100,7 @@ update_fpos_cache (FILE *fp _GL_UNUSED_PARAMETER,
                    off_t pos _GL_UNUSED_PARAMETER)
 {
 #  if defined __sferror || defined __DragonFly__ || defined __ANDROID__
-  /* FreeBSD, NetBSD, OpenBSD, DragonFly, Mac OS X, Cygwin, Android */
+  /* FreeBSD, NetBSD, OpenBSD, DragonFly, Mac OS X, Cygwin, Minix 3, Android */
 #   if defined __CYGWIN__
   /* fp_->_offset is typed as an integer.  */
   fp_->_offset = pos;
@@ -148,7 +150,8 @@ rpl_fflush (FILE *stream)
   if (stream == NULL || ! freading (stream))
     return fflush (stream);
 
-#if defined _IO_ftrylockfile || __GNU_LIBRARY__ == 1 /* GNU libc, BeOS, Haiku, Linux libc5 */
+#if defined _IO_EOF_SEEN || defined _IO_ftrylockfile || __GNU_LIBRARY__ == 1
+  /* GNU libc, BeOS, Haiku, Linux libc5 */
 
   clear_ungetc_buffer_preserving_position (stream);
 
@@ -156,25 +159,28 @@ rpl_fflush (FILE *stream)
 
 #else
   {
-    /* Notes about the file-position indicator:
-       1) The file position indicator is incremented by fgetc() and decremented
+    /* What POSIX says:
+       1) About the file-position indicator (-> fseeko, ftello):
+          The file position indicator is incremented by fgetc() and decremented
           by ungetc():
-          <http://www.opengroup.org/susv3/functions/fgetc.html>
+          <https://pubs.opengroup.org/onlinepubs/9699919799/functions/fgetc.html>
             "... the fgetc() function shall ... advance the associated file
              position indicator for the stream ..."
-          <http://www.opengroup.org/susv3/functions/ungetc.html>
+          <https://pubs.opengroup.org/onlinepubs/9699919799/functions/ungetc.html>
             "The file-position indicator is decremented by each successful
              call to ungetc()..."
-       2) <http://www.opengroup.org/susv3/functions/ungetc.html> says:
-            "The value of the file-position indicator for the stream after
-             reading or discarding all pushed-back bytes shall be the same
-             as it was before the bytes were pushed back."
-          Here we are discarding all pushed-back bytes.  But more specifically,
-       3) <http://www.opengroup.org/austin/aardvark/latest/xshbug3.txt> says:
-            "[After fflush(),] the file offset of the underlying open file
-             description shall be set to the file position of the stream, and
-             any characters pushed back onto the stream by ungetc() ... shall
-             be discarded."  */
+       2) fflush discards bytes pushed back by ungetc:
+          <https://pubs.opengroup.org/onlinepubs/9699919799/functions/fflush.html>
+            "...any characters pushed back onto the stream by ungetc()
+             or ungetwc() that have not subsequently been read from the
+             stream shall be discarded..."
+          This implies implicitly: fflush does not change the file position
+          indicator.
+       3) Effects on the file descriptor, if the file descriptor is capable of
+          seeking:
+          <https://pubs.opengroup.org/onlinepubs/9699919799/functions/fflush.html>
+            "...the file offset of the underlying open file description shall
+             be set to the file position of the stream..."  */
 
     /* POSIX does not specify fflush behavior for non-seekable input
        streams.  Some implementations purge unread data, some return
@@ -199,7 +205,7 @@ rpl_fflush (FILE *stream)
     }
 
 # if (defined __sferror || defined __DragonFly__ || defined __ANDROID__) && defined __SNPT
-    /* FreeBSD, NetBSD, OpenBSD, DragonFly, Mac OS X, Cygwin, Android */
+    /* FreeBSD, NetBSD, OpenBSD, DragonFly, Mac OS X, Cygwin, Minix 3, Android */
 
     {
       /* Disable seek optimization for the next fseeko call.  This tells the

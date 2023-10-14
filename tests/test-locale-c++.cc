@@ -1,5 +1,5 @@
 /* Test of <locale.h> substitute in C++ mode.
-   Copyright (C) 2010-2016 Free Software Foundation, Inc.
+   Copyright (C) 2010-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Bruno Haible <bruno@clisp.org>, 2010.  */
 
@@ -24,12 +24,24 @@
 #include "signature.h"
 
 
+#if GNULIB_TEST_LOCALECONV
+SIGNATURE_CHECK (GNULIB_NAMESPACE::localeconv, struct lconv *, (void));
+#endif
+
 #if GNULIB_TEST_SETLOCALE
 SIGNATURE_CHECK (GNULIB_NAMESPACE::setlocale, char *, (int, const char *));
 #endif
 
-#if GNULIB_TEST_DUPLOCALE && HAVE_DUPLOCALE
+#if 0
+SIGNATURE_CHECK (GNULIB_NAMESPACE::newlocale, locale_t, (int, const char *, locale_t));
+#endif
+
+#if GNULIB_TEST_DUPLOCALE && HAVE_WORKING_DUPLOCALE
 SIGNATURE_CHECK (GNULIB_NAMESPACE::duplocale, locale_t, (locale_t));
+#endif
+
+#if 0
+SIGNATURE_CHECK (GNULIB_NAMESPACE::freelocale, void, (locale_t));
 #endif
 
 

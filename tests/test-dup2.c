@@ -1,5 +1,5 @@
 /* Test duplicating file descriptors.
-   Copyright (C) 2009-2016 Free Software Foundation, Inc.
+   Copyright (C) 2009-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Eric Blake <ebb9@byu.net>, 2009.  */
 
@@ -36,12 +36,16 @@ SIGNATURE_CHECK (dup2, int, (int, int));
 # include "cloexec.h"
 #endif
 
-#if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
+#if defined _WIN32 && ! defined __CYGWIN__
 /* Get declarations of the native Windows API functions.  */
 # define WIN32_LEAN_AND_MEAN
 # include <windows.h>
 /* Get _get_osfhandle.  */
-# include "msvc-nothrow.h"
+# if GNULIB_MSVC_NOTHROW
+#  include "msvc-nothrow.h"
+# else
+#  include <io.h>
+# endif
 #endif
 
 #include "macros.h"
@@ -50,7 +54,7 @@ SIGNATURE_CHECK (dup2, int, (int, int));
 static int
 is_open (int fd)
 {
-#if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
+#if defined _WIN32 && ! defined __CYGWIN__
   /* On native Windows, the initial state of unassigned standard file
      descriptors is that they are open but point to an
      INVALID_HANDLE_VALUE, and there is no fcntl.  */
@@ -68,7 +72,7 @@ is_open (int fd)
 static int
 is_inheritable (int fd)
 {
-# if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
+# if defined _WIN32 && ! defined __CYGWIN__
   /* On native Windows, the initial state of unassigned standard file
      descriptors is that they are open but point to an
      INVALID_HANDLE_VALUE, and there is no fcntl.  */
@@ -88,7 +92,7 @@ is_inheritable (int fd)
 #endif /* GNULIB_TEST_CLOEXEC */
 
 #if !O_BINARY
-# define setmode(f,m) zero ()
+# define set_binary_mode(f,m) zero ()
 static int zero (void) { return 0; }
 #endif
 
@@ -97,8 +101,8 @@ static int zero (void) { return 0; }
 static int
 is_mode (int fd, int mode)
 {
-  int value = setmode (fd, O_BINARY);
-  setmode (fd, value);
+  int value = set_binary_mode (fd, O_BINARY);
+  set_binary_mode (fd, value);
   return mode == value;
 }
 
@@ -199,11 +203,11 @@ main (void)
 
   /* On systems that distinguish between text and binary mode, dup2
      reuses the mode of the source.  */
-  setmode (fd, O_BINARY);
+  set_binary_mode (fd, O_BINARY);
   ASSERT (is_mode (fd, O_BINARY));
   ASSERT (dup2 (fd, fd + 1) == fd + 1);
   ASSERT (is_mode (fd + 1, O_BINARY));
-  setmode (fd, O_TEXT);
+  set_binary_mode (fd, O_TEXT);
   ASSERT (is_mode (fd, O_TEXT));
   ASSERT (dup2 (fd, fd + 1) == fd + 1);
   ASSERT (is_mode (fd + 1, O_TEXT));

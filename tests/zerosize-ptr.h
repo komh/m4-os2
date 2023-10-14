@@ -1,5 +1,5 @@
 /* Return a pointer to a zero-size object in memory.
-   Copyright (C) 2009-2016 Free Software Foundation, Inc.
+   Copyright (C) 2009-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,19 +12,33 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* ISO C 99 does not allow memcmp(), memchr() etc. to be invoked with a NULL
    argument.  Therefore this file produces a non-NULL pointer which cannot
    be dereferenced, if possible.  */
+
+/* On Android, when targeting Android 4.4 or older with a GCC toolchain,
+   prevent a compilation error
+     "error: call to 'mmap' declared with attribute error: mmap is not
+      available with _FILE_OFFSET_BITS=64 when using GCC until android-21.
+      Either raise your minSdkVersion, disable _FILE_OFFSET_BITS=64, or
+      switch to Clang."
+   The files that we access in this compilation unit are less than 2 GB
+   large.  */
+#if defined __ANDROID__
+# undef _FILE_OFFSET_BITS
+# undef __USE_FILE_OFFSET64
+#endif
 
 #include <stdlib.h>
 
 /* Test whether mmap() and mprotect() are available.
    We don't use HAVE_MMAP, because AC_FUNC_MMAP would not define it on HP-UX.
    HAVE_MPROTECT is not enough, because mingw does not have mmap() but has an
-   mprotect() function in libgcc.a.  */
-#if HAVE_SYS_MMAN_H && HAVE_MPROTECT
+   mprotect() function in libgcc.a.
+   And OS/2 kLIBC has <sys/mman.h> and mprotect(), but not mmap().  */
+#if HAVE_SYS_MMAN_H && HAVE_MPROTECT && !defined __KLIBC__
 # include <fcntl.h>
 # include <unistd.h>
 # include <sys/types.h>
@@ -45,7 +59,7 @@ zerosize_ptr (void)
 {
 /* Use mmap and mprotect when they exist.  Don't test HAVE_MMAP, because it is
    not defined on HP-UX 11 (since it does not support MAP_FIXED).  */
-#if HAVE_SYS_MMAN_H && HAVE_MPROTECT
+#if HAVE_SYS_MMAN_H && HAVE_MPROTECT && !defined __KLIBC__
 # if HAVE_MAP_ANONYMOUS
   const int flags = MAP_ANONYMOUS | MAP_PRIVATE;
   const int fd = -1;

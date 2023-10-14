@@ -1,5 +1,5 @@
 /* Test of <locale.h> substitute.
-   Copyright (C) 2007, 2009-2016 Free Software Foundation, Inc.
+   Copyright (C) 2007, 2009-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Bruno Haible <bruno@clisp.org>, 2007.  */
 
@@ -44,7 +44,7 @@ verify (sizeof NULL == sizeof (void *));
 int
 main ()
 {
-#if HAVE_NEWLOCALE
+#if HAVE_WORKING_NEWLOCALE
   /* Check that the locale_t type and the LC_GLOBAL_LOCALE macro are defined.  */
   locale_t b = LC_GLOBAL_LOCALE;
   (void) b;

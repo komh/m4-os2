@@ -1,5 +1,5 @@
 /* Test of ordered set data type implementation.
-   Copyright (C) 2006-2016 Free Software Foundation, Inc.
+   Copyright (C) 2006-2021 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2007.
 
    This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
@@ -25,6 +25,8 @@
 #include "gl_xlist.h"
 #include "gl_array_list.h"
 #include "macros.h"
+
+#include "test-oset-update.h"
 
 static const char *objects[30] =
   {
@@ -66,6 +68,27 @@ check_all (gl_oset_t set1, gl_list_t set2)
   check_equals (set1, set2);
 }
 
+static bool
+is_at_least (const void *elt, const void *threshold)
+{
+  return strcmp ((const char *) elt, (const char *) threshold) >= 0;
+}
+
+static size_t
+gl_sortedlist_indexof_atleast (gl_list_t set,
+                               gl_setelement_threshold_fn threshold_fn,
+                               const void *threshold)
+{
+  /* This implementation is slow, but easy to verify.  */
+  size_t count = gl_list_size (set);
+  size_t index;
+
+  for (index = 0; index < count; index++)
+    if (threshold_fn (gl_list_get_at (set, index), threshold))
+      return index;
+  return (size_t)(-1);
+}
+
 int
 main (int argc, char *argv[])
 {
@@ -103,7 +126,7 @@ main (int argc, char *argv[])
 
     for (repeat = 0; repeat < 100000; repeat++)
       {
-        unsigned int operation = RANDOM (3);
+        unsigned int operation = RANDOM (4);
         switch (operation)
           {
           case 0:
@@ -129,6 +152,32 @@ main (int argc, char *argv[])
                       == gl_sortedlist_remove (set2, (gl_listelement_compar_fn)strcmp, obj));
             }
             break;
+          case 3:
+            {
+              const char *obj = RANDOM_OBJECT ();
+              gl_oset_iterator_t iter = gl_oset_iterator_atleast (set1, is_at_least, obj);
+              size_t index = gl_sortedlist_indexof_atleast (set2, is_at_least, obj);
+              const void *elt;
+              /* Check the first two values that the iterator produces.
+                 Checking them all would make this part of the test dominate the
+                 run time of the test.  */
+              if (index == (size_t)(-1))
+                ASSERT (!gl_oset_iterator_next (&iter, &elt));
+              else
+                {
+                  ASSERT (gl_oset_iterator_next (&iter, &elt));
+                  ASSERT (elt == gl_list_get_at (set2, index));
+                  if (index + 1 == gl_list_size (set2))
+                    ASSERT (!gl_oset_iterator_next (&iter, &elt));
+                  else
+                    {
+                      ASSERT (gl_oset_iterator_next (&iter, &elt));
+                      ASSERT (elt == gl_list_get_at (set2, index + 1));
+                    }
+                }
+              gl_oset_iterator_free (&iter);
+            }
+            break;
           }
         check_all (set1, set2);
       }
@@ -136,6 +185,8 @@ main (int argc, char *argv[])
     gl_oset_free (set1);
     gl_list_free (set2);
   }
+
+  test_update (GL_ARRAY_OSET);
 
   return 0;
 }

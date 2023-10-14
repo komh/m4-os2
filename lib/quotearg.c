@@ -1,6 +1,6 @@
 /* quotearg.c - quote arguments for output
 
-   Copyright (C) 1998-2002, 2004-2016 Free Software Foundation, Inc.
+   Copyright (C) 1998-2002, 2004-2021 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Paul Eggert <eggert@twinsun.com> */
 
@@ -29,6 +29,7 @@
 #include "quotearg.h"
 #include "quote.h"
 
+#include "attribute.h"
 #include "minmax.h"
 #include "xalloc.h"
 #include "c-strcaseeq.h"
@@ -310,7 +311,7 @@ quotearg_buffer_restyled (char *buffer, size_t buffersize,
     case c_maybe_quoting_style:
       quoting_style = c_quoting_style;
       elide_outer_quotes = true;
-      /* Fall through.  */
+      FALLTHROUGH;
     case c_quoting_style:
       if (!elide_outer_quotes)
         STORE ('"');
@@ -349,7 +350,7 @@ quotearg_buffer_restyled (char *buffer, size_t buffersize,
                for your locale.
 
                If you don't know what to put here, please see
-               <http://en.wikipedia.org/wiki/Quotation_marks_in_other_languages>
+               <https://en.wikipedia.org/wiki/Quotation_marks_in_other_languages>
                and use glyphs suitable for your language.  */
             left_quote = gettext_quote (N_("`"), quoting_style);
             right_quote = gettext_quote (N_("'"), quoting_style);
@@ -365,14 +366,14 @@ quotearg_buffer_restyled (char *buffer, size_t buffersize,
 
     case shell_escape_quoting_style:
       backslash_escapes = true;
-      /* Fall through.  */
+      FALLTHROUGH;
     case shell_quoting_style:
       elide_outer_quotes = true;
-      /* Fall through.  */
+      FALLTHROUGH;
     case shell_escape_always_quoting_style:
       if (!elide_outer_quotes)
         backslash_escapes = true;
-      /* Fall through.  */
+      FALLTHROUGH;
     case shell_always_quoting_style:
       quoting_style = shell_always_quoting_style;
       if (!elide_outer_quotes)
@@ -505,7 +506,7 @@ quotearg_buffer_restyled (char *buffer, size_t buffersize,
           if (quoting_style == shell_always_quoting_style
               && elide_outer_quotes)
             goto force_outer_quoting_style;
-          /* Fall through.  */
+          /* fall through */
         c_escape:
           if (backslash_escapes)
             {
@@ -517,14 +518,14 @@ quotearg_buffer_restyled (char *buffer, size_t buffersize,
         case '{': case '}': /* sometimes special if isolated */
           if (! (argsize == SIZE_MAX ? arg[1] == '\0' : argsize == 1))
             break;
-          /* Fall through.  */
+          FALLTHROUGH;
         case '#': case '~':
           if (i != 0)
             break;
-          /* Fall through.  */
+          FALLTHROUGH;
         case ' ':
           c_and_shell_quote_compat = true;
-          /* Fall through.  */
+          FALLTHROUGH;
         case '!': /* special in bash */
         case '"': case '$': case '&':
         case '(': case ')': case '*': case ';':
@@ -863,7 +864,8 @@ quotearg_free (void)
    OPTIONS specifies the quoting options.
    The returned value points to static storage that can be
    reused by the next call to this function with the same value of N.
-   N must be nonnegative.  N is deliberately declared with type "int"
+   N must be nonnegative; it is typically small, and must be
+   less than MIN (INT_MAX, IDX_MAX).  The type of N is signed
    to allow for future extensions (using negative values).  */
 static char *
 quotearg_n_options (int n, char const *arg, size_t argsize,
@@ -873,21 +875,21 @@ quotearg_n_options (int n, char const *arg, size_t argsize,
 
   struct slotvec *sv = slotvec;
 
-  if (n < 0)
+  int nslots_max = MIN (INT_MAX, IDX_MAX);
+  if (! (0 <= n && n < nslots_max))
     abort ();
 
   if (nslots <= n)
     {
       bool preallocated = (sv == &slotvec0);
+      idx_t new_nslots = nslots;
 
-      if (MIN (INT_MAX, MIN (PTRDIFF_MAX, SIZE_MAX) / sizeof *sv) <= n)
-        xalloc_die ();
-
-      slotvec = sv = xrealloc (preallocated ? NULL : sv, (n + 1) * sizeof *sv);
+      slotvec = sv = xpalloc (preallocated ? NULL : sv, &new_nslots,
+                              n - nslots + 1, nslots_max, sizeof *sv);
       if (preallocated)
         *sv = slotvec0;
-      memset (sv + nslots, 0, (n + 1 - nslots) * sizeof *sv);
-      nslots = n + 1;
+      memset (sv + nslots, 0, (new_nslots - nslots) * sizeof *sv);
+      nslots = new_nslots;
     }
 
   {
@@ -1071,3 +1073,10 @@ quote (char const *arg)
 {
   return quote_n (0, arg);
 }
+
+/*
+ * Hey Emacs!
+ * Local Variables:
+ * coding: utf-8
+ * End:
+ */

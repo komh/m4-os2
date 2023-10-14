@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2008-2021 Free Software Foundation, Inc.
  * Written by Eric Blake
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
@@ -48,7 +48,9 @@ main (void)
   ASSERT (MEMCHR2 (input, 'b', 'a', n) == input);
 
   ASSERT (MEMCHR2 (input, 'a', 'b', 0) == NULL);
-  ASSERT (MEMCHR2 (zerosize_ptr (), 'a', 'b', 0) == NULL);
+  void *page_boundary = zerosize_ptr ();
+  if (page_boundary)
+    ASSERT (MEMCHR2 (page_boundary, 'a', 'b', 0) == NULL);
 
   ASSERT (MEMCHR2 (input, 'b', 'd', n) == input + 1);
   ASSERT (MEMCHR2 (input + 2, 'b', 'd', n - 2) == input + 1026);
